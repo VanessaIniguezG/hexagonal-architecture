@@ -15,7 +15,8 @@ user_router = APIRouter(prefix="/users")
 
 @user_router.get("/", response_model=typing.List[UserOutput])
 def get_users(get_users_use_case: GetUsersUseCase = Depends(get_users_case)):
-    users = get_users_use_case.handle()
+    get_users_use_case_response = get_users_use_case.handle()
+    users = get_users_use_case_response.users
     return [
         UserOutput(
             identifier=user.identifier,
