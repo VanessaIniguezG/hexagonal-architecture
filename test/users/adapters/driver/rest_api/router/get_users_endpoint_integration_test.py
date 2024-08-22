@@ -6,7 +6,6 @@ from fastapi.testclient import TestClient
 from app.users.domain.factories import get_users_case
 from app.users.domain.ports.driver import GetUsersUseCase
 from app.users.domain import User
-from faker import Faker
 
 
 @pytest.fixture
@@ -18,21 +17,11 @@ def client_factory(application: FastAPI) -> typing.Callable[..., TestClient]:
     application.dependency_overrides = {}
 
 
-def generate_fake_user(faker: Faker) -> dict:
-    return {
-        "identifier": str(faker.uuid4()),
-        "name": faker.name(),
-        "lastname": faker.last_name(),
-        "age": faker.pyint(min_value=1, max_value=90),
-        "email": faker.email(),
-    }
-
-
 class TestGetUsers:
 
     def test__should_return_an_user_array(
         self,
-        faker: Faker,
+        create_fake_user_factory,
         client_factory: typing.Callable[..., TestClient]
     ) -> None:
         class FakeGetUsersUseCase(GetUsersUseCase):
@@ -42,8 +31,8 @@ class TestGetUsers:
                     User(**second_user)
                 ]
 
-        first_user = generate_fake_user(faker)
-        second_user = generate_fake_user(faker)
+        first_user = create_fake_user_factory()
+        second_user = create_fake_user_factory()
         expected_data = [first_user, second_user]
 
         client = client_factory(get_users_use_case=FakeGetUsersUseCase)
